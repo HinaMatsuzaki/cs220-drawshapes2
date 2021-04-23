@@ -15,6 +15,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
+import javax.swing.JPanel;
+
+
 /**
  * A scene of shapes.  Uses the Model-View-Controller (MVC) design pattern,
  * though note that model knows something about the view, as the draw() 
@@ -192,6 +195,26 @@ public class Scene implements Iterable<IShape>
                 Circle circle = new Circle(color, new Point(centerx, centery), diameter);
                 circle.setSelected(selected);
                 addShape(circle);
+            } else if (type.startsWith("EQUILATERALTRIANGLE")) {
+                // EQUILATERALTRIANGLE centerx centery side color selected
+                int centerx = scan.nextInt();
+                int centery = scan.nextInt();
+                int side = scan.nextInt();
+                Color color = Util.stringToColor(scan.next());
+                boolean selected = Boolean.parseBoolean(scan.next());
+                EquilateralTriangle triangle = new EquilateralTriangle(color, new Point(centerx, centery), side);
+                triangle.setSelected(selected);
+                addShape(triangle);
+            } else if (type.startsWith("REGULARHEXAGON")) {
+                // REGULARHEXAGON centerx centery radius color selected
+                int centerx = scan.nextInt();
+                int centery = scan.nextInt();
+                int radius = scan.nextInt();
+                Color color = Util.stringToColor(scan.next());
+                boolean selected = Boolean.parseBoolean(scan.next());
+                RegularHexagon hexagon = new RegularHexagon(color, new Point(centerx, centery), radius);
+                hexagon.setSelected(selected);
+                addShape(hexagon);
             } else if (type.startsWith("RECTANGLE")) {
                 // RECTANGLE left top width height color selected
                 int left = scan.nextInt();
@@ -218,4 +241,18 @@ public class Scene implements Iterable<IShape>
 			if (s.isSelected()) s.move(dx, dy);
 		}
 	}
+
+	public void clear() {
+		shapeList.clear();
+	}
+	
+	public void undo() {
+		final JPanel undoPanel=new JPanel();
+		if(!shapeList.isEmpty()) {
+			shapeList.remove(shapeList.size()-1);
+			undoPanel.repaint();
+		}
+	}
+	
+	
 }

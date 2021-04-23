@@ -15,6 +15,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Scanner;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -22,21 +23,24 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
+
 @SuppressWarnings("serial")
 public class DrawShapes extends JFrame
 {
     private enum ShapeType {
         SQUARE,
         CIRCLE,
+        EQUILATERALTRIANGLE,
+        REGULARHEXAGON,
         RECTANGLE
     }
+
     
     private DrawShapesPanel shapePanel;
     private Scene scene;
     private ShapeType shapeType = ShapeType.SQUARE;
     private Color color = Color.RED;
     private Point startDrag;
-
 
     public DrawShapes(int width, int height)
     {
@@ -83,6 +87,14 @@ public class DrawShapes extends JFrame
                         scene.addShape(new Circle(color,
                                 e.getPoint(),
                                 100));
+                    } else if (shapeType == ShapeType.EQUILATERALTRIANGLE) {
+                    	scene.addShape(new EquilateralTriangle(color,
+                    			e.getPoint(),
+                    			100));	
+                    } else if (shapeType == ShapeType.REGULARHEXAGON) {
+                    	scene.addShape(new RegularHexagon(color,
+                    			e.getPoint(),
+                    			60));	
                     } else if (shapeType == ShapeType.RECTANGLE) {
                         scene.addShape(new Rectangle(
                                 e.getPoint(),
@@ -255,10 +267,31 @@ public class DrawShapes extends JFrame
             public void actionPerformed(ActionEvent e) {
                 String text=e.getActionCommand();
                 System.out.println(text);
-                // change the color instance variable to blue
+                // change the color instance variable to green
                 color = Color.GREEN;
             }
         });
+        
+        addToMenu(colorMenu, "Custom", new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String text=e.getActionCommand();
+                System.out.println(text);
+
+                Scanner custom=new Scanner(System.in);
+                System.out.println("Choose a value from 0 to 255 for RED: ");
+                int red=custom.nextInt();
+                System.out.println("Choose a value from 0 to 255 for GREEN: ");
+                int green=custom.nextInt();
+                System.out.println("Choose a value from 0 to 255 for BLUE: ");
+                int blue=custom.nextInt();
+                Color newColor=new Color(red, green, blue);
+                color=newColor;
+       //       custom.close();        
+ 
+			}
+		});
+
         
         // shape menu
         JMenu shapeMenu = new JMenu("Shape");
@@ -282,6 +315,23 @@ public class DrawShapes extends JFrame
             }
         });
         
+        // equilateralTriangle
+        addToMenu(shapeMenu, "Triangle", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Triangle");
+                shapeType = ShapeType.EQUILATERALTRIANGLE;
+            }
+        });
+        
+     // regularHexagon
+        addToMenu(shapeMenu, "Hexagon", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Hexagon");
+                shapeType = ShapeType.REGULARHEXAGON;
+            }
+        });
         
         // operation mode menu
         JMenu operationModeMenu=new JMenu("Operation");
@@ -317,6 +367,27 @@ public class DrawShapes extends JFrame
         });
         
 
+        // clear
+        addToMenu (operationModeMenu, "Clear", new ActionListener() {
+        	@Override
+        	public void actionPerformed(ActionEvent e){
+        		String text=e.getActionCommand();
+                System.out.println(text);
+        		scene.clear();
+        		repaint();
+        	}
+        });
+        
+        // undo
+        addToMenu (operationModeMenu, "Undo", new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		String text=e.getActionCommand();
+                System.out.println(text); 
+                scene.undo();
+                repaint();
+        	}
+        });
+        
         // set the menu bar for this frame
         this.setJMenuBar(menuBar);
     }
@@ -339,8 +410,12 @@ public class DrawShapes extends JFrame
             	System.out.println("key pressed: " + e.getKeyChar());
             	if (e.getKeyCode() == KeyEvent.VK_LEFT) {
             		scene.moveSelected(-50, 0);
+            	} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+            		scene.moveSelected(50, 0);
             	} else if (e.getKeyCode() == KeyEvent.VK_UP) {
             		scene.moveSelected(0, -50);
+            	} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+            		scene.moveSelected(0, 50);
             	}
             	repaint();
             }
